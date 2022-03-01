@@ -1,2 +1,2 @@
 # Smart-Curtain
-project for CSCE 483
+Project for CSCE 483

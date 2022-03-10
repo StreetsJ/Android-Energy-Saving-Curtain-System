@@ -1,3 +1,10 @@
 <resources>
   <string name="app_name">Smart Curtain</string>
+  <string name="manual_control">Manual Control</string>
+  <string name="smart_curtains_app">Smart Curtains App</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="manual">Manual</string>
+  <string name="automatic">Automatic</string>
+  <string name="mode">Mode</string>
 </resources>

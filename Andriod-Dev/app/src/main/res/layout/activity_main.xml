@@ -10,13 +10,12 @@
     android:id="@+id/open_btn"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="64dp"
+    android:layout_marginTop="96dp"
     android:text="@string/open"
-    android:onClick="onOpenClick"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.498"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/man_cntrl_txt"/>
+    app:layout_constraintTop_toBottomOf="@+id/man_cntrl_txt" />
 
   <Button
     android:id="@+id/close_btn"
@@ -24,11 +23,12 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="88dp"
     android:text="@string/close"
-    android:onClick="onCloseClick"
+    app:layout_constraintBottom_toTopOf="@+id/bottomTabLayout"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.498"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/open_btn" />
+    app:layout_constraintTop_toBottomOf="@+id/open_btn"
+    app:layout_constraintVertical_bias="0.097" />
 
   <TextView
     android:id="@+id/title_text"
@@ -45,46 +45,32 @@
     android:id="@+id/man_cntrl_txt"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="72dp"
+    android:layout_marginTop="64dp"
     android:text="@string/manual_control"
     android:textAppearance="@style/TextAppearance.AppCompat.Large"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/title_text" />
 
-  <Button
-    android:id="@+id/auto_btn"
-    android:layout_width="wrap_content"
+  <com.google.android.material.tabs.TabLayout
+    android:id="@+id/bottomTabLayout"
+    android:layout_width="409dp"
     android:layout_height="wrap_content"
-    android:text="@string/automatic"
-    android:onClick="onAutoClick"
-    app:layout_constraintBottom_toBottomOf="@+id/divider"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.109"
-    app:layout_constraintStart_toEndOf="@+id/divider"
-    app:layout_constraintTop_toTopOf="@+id/divider" />
-
-  <View
-    android:id="@+id/divider"
-    android:layout_width="1dp"
-    android:layout_height="50dp"
-    android:background="?android:attr/listDivider"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/close_btn"
-    app:layout_constraintVertical_bias="0.664" />
+    app:tabIndicatorColor="@color/magenta"
+    app:tabSelectedTextColor="@color/magenta" >
 
-  <Button
-    android:id="@+id/man_btn"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/manual"
-    android:onClick="onManualClick"
-    app:layout_constraintBottom_toBottomOf="@+id/divider"
-    app:layout_constraintEnd_toStartOf="@+id/divider"
-    app:layout_constraintHorizontal_bias="0.887"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/divider" />
+    <com.google.android.material.tabs.TabItem
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Manual" />
+
+    <com.google.android.material.tabs.TabItem
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Automatic" />
+  </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

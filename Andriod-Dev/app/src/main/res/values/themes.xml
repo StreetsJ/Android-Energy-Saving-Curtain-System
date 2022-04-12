@@ -12,5 +12,15 @@
     <!-- Status bar color. -->
     <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
     <!-- Customize your theme here. -->
+    <item name="colorAccent">@color/light_green</item>
   </style>
+
+  <style name="Theme.SmartCurtain.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+  </style>
+
+  <style name="Theme.SmartCurtain.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+  <style name="Theme.SmartCurtain.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -9,9 +9,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.google.android.material.tabs.TabLayout;
-
-import java.util.Set;
-
 import tamu.edu.smartcurtain.databinding.ActivityMainBinding;
 import tamu.edu.smartcurtain.ui.main.SectionsPagerAdapter;
 

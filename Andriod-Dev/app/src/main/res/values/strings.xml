@@ -13,4 +13,5 @@
   <string name="desired_temp">Enter your desired temperature</string>
   <string name="go_btn_text">Go</string>
   <string name="automatic_control">Automatic Control</string>
+  <string name="settings_button">Settings button</string>
 </resources>

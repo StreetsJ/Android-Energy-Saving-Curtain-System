@@ -1,5 +1,6 @@
 package tamu.edu.smartcurtain;
 
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
     private Button go_btn;
     private EditText desired_temp;
     private int open_color;
+    BluetoothSocket btSocket = null;
+
     View view;
 
     @Nullable
@@ -39,6 +42,11 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
 
         // Call onClick override for go_btn
         InitView();
+
+        // Get BT Socket for comms
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        btSocket = main.getBtSocket();
 
         return view;
     }

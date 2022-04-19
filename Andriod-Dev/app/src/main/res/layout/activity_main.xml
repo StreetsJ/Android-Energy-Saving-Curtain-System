@@ -31,13 +31,13 @@
       <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="39dp"
-        android:layout_height="39dp"
+        android:layout_height="48dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:paddingEnd="20dp"
         android:background="#00FFFFFF"
-        app:srcCompat="@drawable/ic_settings_btn"
-        android:contentDescription="@string/settings_button" />
+        android:contentDescription="@string/settings_button"
+        android:paddingEnd="20dp"
+        app:srcCompat="@drawable/ic_settings_btn" />
     </RelativeLayout>
 
     <com.google.android.material.tabs.TabLayout

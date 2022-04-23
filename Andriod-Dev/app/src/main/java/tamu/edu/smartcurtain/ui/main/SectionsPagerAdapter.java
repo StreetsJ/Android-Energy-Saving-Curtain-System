@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import tamu.edu.smartcurtain.FragmentAutomatic;
 import tamu.edu.smartcurtain.FragmentManual;
-import tamu.edu.smartcurtain.FragmentSettings;
 import tamu.edu.smartcurtain.R;
 
 /**
@@ -38,9 +37,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 fragment = new FragmentAutomatic();
                 break;
-            case 2:
-                fragment = new FragmentSettings();
-                break;
             default:
                 break;
         }
@@ -56,6 +52,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 }

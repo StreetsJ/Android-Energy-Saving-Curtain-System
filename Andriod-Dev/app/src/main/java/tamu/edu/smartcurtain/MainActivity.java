@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if (!ConnectSuccess) {
                 msg("Connection Failed. Is it a SPP Bluetooth? Try again.");
-                finish();
             } else {
                 msg("Connected");
                 isBtConnected = true;

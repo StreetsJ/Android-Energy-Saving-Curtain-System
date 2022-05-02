@@ -1,82 +1,88 @@
-#include <dht11.h>
+#include <dht_nonblocking.h>
+
+//www.elegoo.com
+//2018.10.25
+
 #include <SoftwareSerial.h>
+#include <dht_nonblocking.h>
+#define DHT_SENSOR_TYPE DHT_TYPE_11
+static const int DHT_SENSOR_PIN = 7;
+DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
-//#include <dht.h>
-#define dht_apin A1 
-#define ledPin 7
-dht11 DHT;
-SoftwareSerial BTserial(0, 1); // RX | TX
+const int RX_PIN = 2;
+const int TX_PIN = 3;
+SoftwareSerial serial(RX_PIN, TX_PIN);
+char commandChar;
+int state;
 
-//Define the variable that contains the led
-int state = 0;
+/*
+ * Initialize the serial port.
+ */
+void setup( )
+{
+  serial.begin(9600);
+//  Serial.begin(38400);
+}
 
-void setup(){
-  //Setting the pin mode and initial LOW
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
-  Serial.begin(9600);
-  delay(500);//Delay to let system boot
-  Serial.println("DHT11 Humidity & temperature Sensor, Light Intensity Sensor, BT Communication Module\n\n");
-  delay(1000);//Wait before accessing Sensor
- 
-}//end "setup()"
- 
-void loop(){
-  //Start of Program 
-  // Checks if the data is coming from the serial port
-  if(Serial.available() > 0){
-    state = Serial.read(); // Read the data from the serial port
-  }
-    //Deciding functions for LED on and off
-  if (state == '0') {
-    digitalWrite(ledPin, LOW); // Turn LED OFF
-    // Send back, to the phone, the String "LED: ON"
-    Serial.println("LED: OFF");
-    state = 0;
-  }
-  else if (state == '1') {
-    digitalWrite(ledPin, HIGH);
-    Serial.println("LED: ON");;
-    state = 0;
-  }
- 
-    DHT.read(dht_apin);
-    Serial.print("Current humidity = ");
-    Serial.print(DHT.humidity);
-    Serial.print("%  ");
-    Serial.print("temperature = ");
-    Serial.print(DHT.temperature); 
-    Serial.println("C  ");
 
-    // Light intensity
-    int lightIntensity = analogRead(A0);
-    Serial.print("Light intensity reading = ");
-    Serial.print(lightIntensity);   // the raw analog reading
-    // We'll have a few threshholds, qualitatively determined
-    if (lightIntensity < 100) {
-      Serial.println(" - Dark");
-    } else if (lightIntensity < 200) {
-      Serial.println(" - Light");
-    } else if (lightIntensity < 500) {
-      Serial.println(" - Bright");
-    } else if (lightIntensity < 800) {
-      Serial.println(" - Very Bright");
-    } else {
-      Serial.println(" - Dark");
+
+/*
+ * Poll for a measurement, keeping the state machine alive.  Returns
+ * true if a measurement is available.
+ */
+static bool measure_environment( float *temperature, float *humidity )
+{
+  static unsigned long measurement_timestamp = millis( );
+
+  /* Measure once every four seconds. == 4000ul */
+//  if( millis( ) - measurement_timestamp > 300000ul )
+  if (millis( ) - measurement_timestamp > 10000ul )
+  {
+    if( dht_sensor.measure( temperature, humidity ) == true )
+    {
+      measurement_timestamp = millis( );
+      return( true );
     }
+  }
 
-    Serial.println();
-
-    BTserial.print(DHT.humidity);
-    BTserial.print(",");
-    BTserial.print(DHT.temperature);
-    BTserial.print(",");
-    BTserial.print(lightIntensity);
+  return( false );
+}
 
 
+/*
+ * Main program loop.
+ */
+void loop( )
+{
+  float temperature;
+  float humidity;
 
-    
-    delay(1000);//Wait 1 second before accessing sensor again.
-    //exit(0);
- 
-}// end loop(
+  /* Measure temperature and humidity.  If the functions returns
+     true, then a measurement is available. */
+  if (state)
+  {
+    if( measure_environment( &temperature, &humidity ) == true )
+    {
+      serial.print(temperature * 9/5 + 32);
+      serial.print("#");
+    } 
+  }
+  
+  if (serial.available())
+  {
+    commandChar = serial.read();
+    switch(commandChar)
+    {
+      case '*':
+        serial.print(temperature * 9/5 + 32, 1);
+        serial.print("#");
+        break;
+      case '0':
+        state = 0;
+        break;
+      case '1':
+        state = 1;
+        break;
+    }
+  }
+}

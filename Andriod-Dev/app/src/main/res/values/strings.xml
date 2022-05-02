@@ -1,3 +1,18 @@
 <resources>
   <string name="app_name">Smart Curtain</string>
+  <string name="manual_control">Manual Control</string>
+  <string name="smart_curtains_app">Smart Curtains App</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="manual">Manual</string>
+  <string name="automatic">Automatic</string>
+  <string name="mode">Mode</string>
+  <string name="tab_text_1">Manual</string>
+  <string name="tab_text_2">Automatic</string>
+  <string name="tab_text_3">Settings</string>
+  <string name="desired_temp">Enter your desired temperature</string>
+  <string name="go_btn_text">Go</string>
+  <string name="automatic_control">Automatic Control</string>
+  <string name="settings_button">Settings button</string>
+  <string name="enter_your_current_temperature">Enter your current temperature</string>
 </resources>

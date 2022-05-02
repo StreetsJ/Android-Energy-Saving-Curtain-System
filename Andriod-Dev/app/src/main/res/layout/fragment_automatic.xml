@@ -6,6 +6,22 @@
   android:layout_height="match_parent">
 
   <EditText
+    android:id="@+id/editTextCurrentTemp"
+    android:layout_width="290dp"
+    android:layout_height="48dp"
+    android:layout_marginTop="52dp"
+    android:autofillHints="75"
+    android:ems="10"
+    android:gravity="center"
+    android:hint="@string/enter_your_current_temperature"
+    android:inputType="number"
+    android:textColorHint="#757575"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.495"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/editTextDesiredTemp" />
+
+  <EditText
     android:id="@+id/editTextDesiredTemp"
     android:layout_width="290dp"
     android:layout_height="48dp"
@@ -30,8 +46,8 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.498"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/editTextDesiredTemp"
-    app:layout_constraintVertical_bias="0.179" />
+    app:layout_constraintTop_toBottomOf="@+id/editTextCurrentTemp"
+    app:layout_constraintVertical_bias="0.404" />
 
   <TextView
     android:id="@+id/auto_cntrl_txt"

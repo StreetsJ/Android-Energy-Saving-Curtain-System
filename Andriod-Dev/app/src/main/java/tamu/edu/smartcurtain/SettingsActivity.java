@@ -1,23 +1,18 @@
 package tamu.edu.smartcurtain;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,18 +25,25 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button getJSON;
     RequestQueue requestQueue;
-    String switchBotCmdUrl = "https://api.switch-bot.com/v1.0/devices/CCDB63AB30A7/commands";
+    String switchBotCmdUrl = "https://api.switch-bot.com/v1.0/devices/CCDB63AB30A7/status";
     ProgressDialog pd;
+    BluetoothSocket btSocket = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        getJSON = (Button) findViewById(R.id.getJSON);
+        Button btnConnect = (Button) findViewById(R.id.connectBtn);
+        Button getJSON = (Button) findViewById(R.id.botStatusButton);
+        Button testArduino = (Button) findViewById(R.id.testArduinoButton);
+
         getJSON.setOnClickListener(this);
+        btnConnect.setOnClickListener(this);
+        testArduino.setOnClickListener(this);
+
+        btSocket = FragmentAutomatic.getSocket();
 
         requestQueue = Volley.newRequestQueue(this);
     }
@@ -49,11 +51,37 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.getJSON:
+            case R.id.botStatusButton:
                 new JsonTask().execute(switchBotCmdUrl);
+                break;
+            case R.id.connectBtn:
+                Disconnect();
+                break;
+            case R.id.testArduinoButton:
+                sendSignal("*");
                 break;
             default:
                 break;
+        }
+    }
+
+    private void sendSignal(String data) {
+        if (btSocket != null) {
+            try {
+                btSocket.getOutputStream().write(data.getBytes());
+            } catch (IOException e) {
+                msg("Error sending " + data + " to arduino");
+            }
+        }
+    }
+
+    private void Disconnect() {
+        if (btSocket != null) {
+            try {
+                btSocket.close();
+            } catch (IOException e) {
+                msg("Error");
+            }
         }
     }
 
@@ -76,16 +104,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 URL url = new URL(params[0]);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestProperty("Authorization", switchBotKey);
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json; utf-8");
-                connection.setRequestProperty("Accept", "application/json");
-                connection.setDoOutput(true);
-
-                String jsonInput = "{\"command\" : \"setPosition\", \"parameter\" : \"(0, ff, 0)\"}";
-                try(OutputStream os = connection.getOutputStream()) {
-                    byte[] input = jsonInput.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
-                }
+                connection.setRequestMethod("GET");
 
                 connection.connect();
 
@@ -100,7 +119,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line+"\n");
                     Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
-
+//                    msg(line);
                 }
 
                 return buffer.toString();
@@ -132,5 +151,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 pd.dismiss();
             }
         }
+    }
+
+    private void msg(String s) {
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
 }

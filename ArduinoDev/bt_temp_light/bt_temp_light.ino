@@ -1,4 +1,5 @@
 #include <dht_nonblocking.h>
+#include <dht11.h>
 
 //www.elegoo.com
 //2018.10.25
@@ -9,11 +10,17 @@
 static const int DHT_SENSOR_PIN = 7;
 DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
+#define dht_window_apin A1
+#define dht_curr_apin A0 
+
 const int RX_PIN = 2;
 const int TX_PIN = 3;
 SoftwareSerial serial(RX_PIN, TX_PIN);
 char commandChar;
 int state;
+dht11 DHTwindow;
+dht11 DHTcurr;
+
 
 /*
  * Initialize the serial port.
@@ -21,9 +28,8 @@ int state;
 void setup( )
 {
   serial.begin(9600);
-//  Serial.begin(38400);
+  Serial.begin(38400);
 }
-
 
 
 /*
@@ -61,11 +67,13 @@ void loop( )
      true, then a measurement is available. */
   if (state)
   {
-    if( measure_environment( &temperature, &humidity ) == true )
-    {
-      serial.print(temperature * 9/5 + 32);
-      serial.print("#");
-    } 
+    DHTwindow.read(dht_window_apin);
+    serial.print(DHTwindow.temperature * 9/5 + 32);
+    serial.print("W");
+    DHTcurr.read(dht_curr_apin);
+    serial.print(DHTcurr.temperature * 9/5 + 32);
+    serial.print("C#");
+    delay(5000);
   }
   
   if (serial.available())
@@ -74,8 +82,12 @@ void loop( )
     switch(commandChar)
     {
       case '*':
-        serial.print(temperature * 9/5 + 32, 1);
-        serial.print("#");
+        DHTwindow.read(dht_window_apin);
+        serial.print(DHTwindow.temperature * 9/5 + 32);
+        serial.print("W");
+        DHTwindow.read(dht_curr_apin);
+        serial.print(DHTcurr.temperature * 9/5 + 32);
+        serial.print("C#");
         break;
       case '0':
         state = 0;

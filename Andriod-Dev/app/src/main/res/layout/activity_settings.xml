@@ -6,6 +6,18 @@
   android:layout_height="match_parent"
   tools:context=".SettingsActivity">
 
+  <TextView
+    android:id="@+id/textViewSlidePosition"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Slide Position: "
+    app:layout_constraintBottom_toTopOf="@+id/botStatusButton"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.044"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/textViewCalibrated"
+    app:layout_constraintVertical_bias="0.328" />
+
   <Button
     android:id="@+id/botStatusButton"
     android:layout_width="wrap_content"
@@ -38,6 +50,19 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/botStatusButton" />
+
+  <TextView
+    android:id="@+id/textViewCalibrated"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:text="Calibrated: "
+    app:layout_constraintBottom_toTopOf="@+id/botStatusButton"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.045"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.118" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

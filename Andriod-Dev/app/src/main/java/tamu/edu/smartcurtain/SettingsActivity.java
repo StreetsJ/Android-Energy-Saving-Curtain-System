@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +33,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     String switchBotCmdUrl = "https://api.switch-bot.com/v1.0/devices/CCDB63AB30A7/status";
     ProgressDialog pd;
     BluetoothSocket btSocket = null;
+    private int status;
+    private TextView textCalibrated, textSlidePosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +45,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         Button getJSON = (Button) findViewById(R.id.botStatusButton);
         Button testArduino = (Button) findViewById(R.id.testArduinoButton);
 
+        textCalibrated = (TextView) findViewById(R.id.textViewCalibrated);
+        textSlidePosition = (TextView) findViewById(R.id.textViewSlidePosition);
+
         getJSON.setOnClickListener(this);
         btnConnect.setOnClickListener(this);
         testArduino.setOnClickListener(this);
 
+//        new JsonTask().execute(switchBotCmdUrl);
+
         btSocket = FragmentAutomatic.getSocket();
 
         requestQueue = Volley.newRequestQueue(this);
+
+        textSlidePosition.setText("Slide Position: " + FragmentManual.getSlidePosition());
+        textCalibrated.setText("Calibrated: " + FragmentManual.getCalibrated());
     }
 
     @Override
@@ -89,10 +103,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         protected void onPreExecute() {
             super.onPreExecute();
 
-            pd = new ProgressDialog(SettingsActivity.this);
-            pd.setMessage("Please wait");
-            pd.setCancelable(false);
-            pd.show();
+//            pd = new ProgressDialog(SettingsActivity.this);
+//            pd.setMessage("Please wait");
+//            pd.setCancelable(false);
+//            pd.show();
         }
 
         protected String doInBackground(String... params) {
@@ -108,7 +122,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
                 connection.connect();
 
-
                 InputStream stream = connection.getInputStream();
 
                 reader = new BufferedReader(new InputStreamReader(stream));
@@ -120,13 +133,19 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     buffer.append(line+"\n");
                     Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
 //                    msg(line);
+                    JSONObject response = null;
+                    try {
+                        response = new JSONObject(line);
+                        status = Integer.parseInt(response.getJSONObject("body").getString("slidePosition"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("Status", " > " + status);
                 }
 
                 return buffer.toString();
 
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -147,9 +166,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
+//            if (pd.isShowing()){
+//                pd.dismiss();
+//            }
         }
     }
 

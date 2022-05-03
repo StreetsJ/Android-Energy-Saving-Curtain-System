@@ -1,10 +1,5 @@
 package tamu.edu.smartcurtain;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.viewpager.widget.ViewPager;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -18,6 +13,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -68,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (position) {
                     case 0:
                         // TODO: send 0 state to arduino
-                        msg("Sending 0 to arduino");
+//                        msg("Sending 0 to arduino");
                         sendSignal("0");
                         FragmentManual.getBotStatus();
                         break;
                     case 1:
                         // TODO: send 1 state to arduino
-                        msg("Sending 1 to arduino");
+//                        msg("Sending 1 to arduino");
                         sendSignal("1");
                         break;
                     default:

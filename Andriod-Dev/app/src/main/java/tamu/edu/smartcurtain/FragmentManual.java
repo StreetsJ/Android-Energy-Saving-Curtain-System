@@ -41,6 +41,7 @@ public class FragmentManual extends Fragment implements View.OnClickListener {
     private static Button open_btn, close_btn;
     private static int prim_color, open_color;
     private static boolean botState, userStatus = false;
+    private static String calibrated, slidePosition;
 
     View view;
 
@@ -108,6 +109,8 @@ public class FragmentManual extends Fragment implements View.OnClickListener {
                     try {
                         response = new JSONObject(line);
                         status = Integer.parseInt(response.getJSONObject("body").getString("slidePosition"));
+                        calibrated = response.getJSONObject("body").getString("calibrate");
+                        slidePosition = response.getJSONObject("body").getString("slidePosition");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -141,6 +144,14 @@ public class FragmentManual extends Fragment implements View.OnClickListener {
             }
             return null;
         }
+    }
+
+    public static String getCalibrated() {
+        return calibrated;
+    }
+
+    public static String getSlidePosition() {
+        return slidePosition;
     }
 
     @Override

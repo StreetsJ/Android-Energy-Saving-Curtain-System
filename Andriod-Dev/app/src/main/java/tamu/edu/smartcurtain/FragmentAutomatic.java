@@ -42,9 +42,7 @@ import java.util.UUID;
 public class FragmentAutomatic extends Fragment implements View.OnClickListener {
     private Button go_btn;
     private static EditText desired_temp;
-    private static EditText current_temp;
-    private int open_color;
-    private static float actual_temp, curr_temp, des_temp = 0.0F;
+    private static int des_temp = 0;
     static ProgressDialog pd;
     String address = "00:21:07:34:D7:38";
     private ProgressDialog progress;
@@ -74,10 +72,9 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
 
         // Get editText object from xml
         desired_temp = view.findViewById(R.id.editTextDesiredTemp);
-        current_temp = view.findViewById(R.id.editTextCurrentTemp);
 
         // Get color from xml
-        open_color = getResources().getColor(R.color.light_green);
+        int open_color = getResources().getColor(R.color.light_green);
 
         // Set button color to light_green by default;
         go_btn.setBackgroundColor(open_color);
@@ -88,7 +85,7 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
         // Get BT Socket for comms
         new ConnectBT().execute();
 
-        algo = new AlgorithmLogic(0.0F, 0.0F, 0.0F);
+        algo = new AlgorithmLogic(0, 0, 0);
 
         return view;
     }
@@ -113,16 +110,11 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
         switch (view.getId()) {
             case R.id.go_btn:
                 try {
-                    curr_temp = Float.parseFloat(current_temp.getText().toString());
-                    des_temp = Float.parseFloat(desired_temp.getText().toString());
+                    des_temp = Integer.parseInt(desired_temp.getText().toString());
                 } finally {
                     isFloat = true;
-                    algo.setCurr_temp(curr_temp);
                     algo.setDesired_temp(des_temp);
                 }
-//                String toastText = "Desired temperature is " + desired_temp.getText().toString();
-//                msg(toastText);
-//                msg("Current temp is " + current_temp.getText().toString());
                 if (!conThread.isAlive()) {
                     conThread.start();
                 }
@@ -166,7 +158,7 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
             super.onPostExecute(result);
 
             if (!ConnectSuccess) {
-                msg("Connection Failed. Is it a SPP Bluetooth? Try again.");
+                msg("Connection Failed. Try again.");
 //                finish();
             } else {
                 msg("Connected");
@@ -194,32 +186,51 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
-                    if (Float.parseFloat(writeMessage) > 120.0 || Float.parseFloat(writeMessage) < 20.0)
+                    int windowTemp = 0, currentTemp = 0;
+                    if (writeMessage.contains("W")) {
+                        windowTemp = Integer.parseInt(writeMessage.substring(0, writeMessage.indexOf("W")));
+                    } else {
+                        System.out.println("Did not receive proper reading");
+                    }
+
+                    if (writeMessage.contains("C")) {
+                        currentTemp =  Integer.parseInt(writeMessage.substring(writeMessage.indexOf("W") + 1, writeMessage.indexOf("C")));
+                    } else {
+                        System.out.println("Did not receive proper reading");
+                    }
+
+                    if ((windowTemp > 120.0 || windowTemp < 20.0) || (currentTemp > 120.0 || currentTemp < 20.0))
                     {
-                        System.out.println("Error in reading: " + writeMessage);
+                        System.out.println("\tError in reading window temp or current temp: " + windowTemp + " or " + currentTemp);
                         conThread.write("*".getBytes(StandardCharsets.UTF_8));
                     }
                     else
                     {
-                        actual_temp = Float.parseFloat(writeMessage);
-                        System.out.println("Reading is " + actual_temp);
-                        if (algo != null && isFloat) {
+                        System.out.println("Room reading is " + currentTemp);
+                        System.out.println("Window reading is " + windowTemp);
+                        if (algo != null) {
                             new BotStatusJsonTask().execute(switchBotStatusUrl);
-                            algo.computeShouldOpen();
 
-                            if (algo.getWindow_temp() != actual_temp) {
-                                algo.setWindow_temp(actual_temp);
+                            if (algo.getWindow_temp() != windowTemp) {
+                                algo.setWindow_temp(windowTemp);
+                                algo.setCurr_temp(currentTemp);
                                 // TODO: Compute algorithm
-
-                                if (botState != algo.isShouldOpen()) new JsonTask().execute(switchBotCmdUrl, algo.isShouldOpen() ? "open" : "close");
-                                System.out.println("Window should be " + (algo.isShouldOpen() ? "open" : "closed"));
+                                algo.computeShouldOpen();
+                                if (botState != algo.isShouldOpen())
+                                {
+                                    new JsonTask().execute(switchBotCmdUrl, algo.isShouldOpen() ? "open" : "close");
+                                    botState = algo.isShouldOpen();
+                                }
+//                                System.out.println("Window should be " + (algo.isShouldOpen() ? "open" : "closed"));
                             }
-                            if (botState != algo.isShouldOpen()) new JsonTask().execute(switchBotCmdUrl, algo.isShouldOpen() ? "open" : "close");
-
-                            else System.out.println("No change in temp");
+//                            System.out.println("BotState = " + botState);
+//                            System.out.println("Should open = " + algo.isShouldOpen());
+                            if (botState != algo.isShouldOpen())
+                            {
+                                new JsonTask().execute(switchBotCmdUrl, algo.isShouldOpen() ? "open" : "close");
+                                botState = algo.isShouldOpen();
+                            }
                         }
-                        // TODO: Call the function/thread to request api for open/close
-//                        new JsonTask().execute(switchBotCmdUrl, algo.isShouldOpen() ? "open" : "close");
                     }
                     break;
             }
@@ -249,16 +260,26 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
             byte[] buffer = new byte[1024];
             int begin = 0;
             int bytes = 0;
+            int cnt = 0;
             while (true) {
                 try {
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+//                    System.out.println("Number of bytes for message is: " + bytes);
                     for(int i = begin; i < bytes; i++) {
+                        if(buffer[i] == "W".getBytes()[0])
+                        {
+                            cnt += 1;
+                        }
                         if(buffer[i] == "#".getBytes()[0]) {
-                            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                            if (cnt == 1) {
+                                mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                                cnt = 0;
+                            }
                             begin = i + 1;
                             if(i == bytes - 1) {
                                 bytes = 0;
                                 begin = 0;
+                                cnt = 0;
                             }
                         }
                     }
@@ -283,6 +304,8 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
     public class JsonTask extends AsyncTask<String, String, String> {
         protected void onPreExecute() {
             super.onPreExecute();
+
+//            System.out.println("Pre executing... bot state is " + botState + " it should be " + algo.isShouldOpen());
 
             pd = new ProgressDialog(getContext());
             pd.setMessage(algo.isShouldOpen() ? "Opening curtain..." : "Closing curtain...");
@@ -327,15 +350,12 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
 
                     while ((line = reader.readLine()) != null) {
                         buffer.append(line+"\n");
-                        Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
-
+//                        Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
                     }
 
                     return buffer.toString();
 
 
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -359,7 +379,7 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            System.out.println("Reached post execute");
+//            System.out.println("Reached post execute");
             if (pd.isShowing()){
                 pd.dismiss();
             }
@@ -393,7 +413,7 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
 
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line+"\n");
-                    Log.d("Response", "> " + line);   //here u ll get whole response...... :-)
+//                    Log.d("Response", "> " + line);   //here u ll get whole response...... :-)
                     JSONObject response = null;
                     try {
                         response = new JSONObject(line);
@@ -401,7 +421,7 @@ public class FragmentAutomatic extends Fragment implements View.OnClickListener 
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.d("Status", " > " + status);
+//                    Log.d("Status", " > " + status);
                     botState = status <= 50;
                 }
 

@@ -70,9 +70,12 @@ void loop( )
     DHTwindow.read(dht_window_apin);
     serial.print(DHTwindow.temperature * 9/5 + 32);
     serial.print("W");
+    Serial.print(DHTwindow.temperature * 9/5 +32);
     DHTcurr.read(dht_curr_apin);
     serial.print(DHTcurr.temperature * 9/5 + 32);
     serial.print("C#");
+    Serial.print(DHTcurr.temperature * 9/5 +32);
+
     delay(5000);
   }
   

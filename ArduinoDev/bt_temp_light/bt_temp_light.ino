@@ -28,41 +28,13 @@ dht11 DHTcurr;
 void setup( )
 {
   serial.begin(9600);
-  Serial.begin(38400);
 }
-
-
-/*
- * Poll for a measurement, keeping the state machine alive.  Returns
- * true if a measurement is available.
- */
-static bool measure_environment( float *temperature, float *humidity )
-{
-  static unsigned long measurement_timestamp = millis( );
-
-  /* Measure once every four seconds. == 4000ul */
-//  if( millis( ) - measurement_timestamp > 300000ul )
-  if (millis( ) - measurement_timestamp > 10000ul )
-  {
-    if( dht_sensor.measure( temperature, humidity ) == true )
-    {
-      measurement_timestamp = millis( );
-      return( true );
-    }
-  }
-
-  return( false );
-}
-
 
 /*
  * Main program loop.
  */
 void loop( )
 {
-  float temperature;
-  float humidity;
-
   /* Measure temperature and humidity.  If the functions returns
      true, then a measurement is available. */
   if (state)
@@ -70,11 +42,9 @@ void loop( )
     DHTwindow.read(dht_window_apin);
     serial.print(DHTwindow.temperature * 9/5 + 32);
     serial.print("W");
-    Serial.print(DHTwindow.temperature * 9/5 +32);
     DHTcurr.read(dht_curr_apin);
     serial.print(DHTcurr.temperature * 9/5 + 32);
     serial.print("C#");
-    Serial.print(DHTcurr.temperature * 9/5 +32);
 
     delay(5000);
   }

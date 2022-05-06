@@ -1,14 +1,5 @@
-#include <dht_nonblocking.h>
 #include <dht11.h>
-
-//www.elegoo.com
-//2018.10.25
-
 #include <SoftwareSerial.h>
-#include <dht_nonblocking.h>
-#define DHT_SENSOR_TYPE DHT_TYPE_11
-static const int DHT_SENSOR_PIN = 7;
-DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
 #define dht_window_apin A1
 #define dht_curr_apin A0 
